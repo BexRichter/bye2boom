@@ -1,0 +1,486 @@
+/* === RESET & BASE === */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  width: 100%;
+  height: auto;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 300vh; /* Make page very long for scrolling */
+  overflow-x: hidden;
+  overflow-y: hidden; /* Lock scroll initially */
+  position: relative;
+}
+
+body.allow-scroll {
+  overflow-y: auto; /* Enable scroll after animation */
+}
+
+/* =========================================================
+   LAYERS
+   Matter: #scene (z:5) — interactive canvas layer
+   Header/Footer: (z:20) — UI elements
+========================================================= */
+
+/* Matter container */
+#scene {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%; /* Takes body height for physics space */
+  z-index: 5;
+  pointer-events: none; /* Allow scrolling through this layer */
+}
+#scene canvas {
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none; /* Default: allow scroll */
+}
+#scene canvas.is-interactive {
+  pointer-events: auto; /* Enable drag when holding mouse/touch */
+}
+
+/* ================= FONT ================= */
+@font-face {
+  font-family: "Boldonese";
+  src: url("/Boldonse-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ================= FONT ================= */
+@font-face {
+  font-family: "Boldonese";
+  src: url("/Boldonse-Regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* ================= SIGNUP BAR ================= */
+.signup-bar {
+  background: #000;
+  width: 100%;
+  position: fixed;
+  bottom: 0; /* At the very bottom */
+  left: 0;
+  right: 0;
+  z-index: 30;
+  padding: clamp(8px, 1.2vw, 12px) clamp(16px, 3vw, 32px);
+  text-align: center;
+  font-family: "Anonymous Pro", monospace;
+}
+
+.signup-text {
+  font-size: clamp(12px, 1.8vw, 17px);
+  color: #FF5F00;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+/* ================= HEADER ================= */
+.site-header {
+  background: #FF5F00; /* orange from screenshot */
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  font-family: "Boldonese", sans-serif;
+}
+
+.nav-inner {
+  width: 100%;
+  padding: clamp(6px, 1vw, 10px) clamp(16px, 2vw, 24px);
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 24px);
+}
+
+/* ================= LOGO ================= */
+.logo {
+  flex-shrink: 0;
+}
+
+.logo img {
+  height: clamp(40px, 5vw, 60px);
+  display: block;
+}
+
+/* ================= NAV LINKS ================= */
+.nav-links {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: clamp(16px, 2vw, 32px);
+  flex-shrink: 0;
+}
+
+.nav-links a {
+  font-size: clamp(14px, 1.8vw, 22px);
+  color: #000;
+  text-decoration: none;
+  line-height: 1;
+  white-space: nowrap;
+  font-weight: 400;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.nav-links a:hover {
+  transform: scale(1.05);
+  opacity: 0.8;
+}
+
+/* ================= ACTION BUTTONS ================= */
+.nav-actions {
+  display: flex;
+  gap: clamp(8px, 1vw, 12px);
+  margin-left: auto; /* Push to the right */
+  flex-shrink: 0;
+}
+
+.btn-outline {
+  font-size: clamp(14px, 1.6vw, 20px);
+  color: #000;
+  text-decoration: none;
+  padding: clamp(6px, 0.8vw, 9px) clamp(14px, 1.6vw, 20px);
+  border: 2px solid #000;
+  white-space: nowrap;
+  font-weight: 400;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-outline:hover {
+  transform: scale(1.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.btn-solid {
+  font-size: clamp(14px, 1.6vw, 20px);
+  color: #E84EB5;
+  background: #000;
+  text-decoration: none;
+  padding: clamp(6px, 0.8vw, 9px) clamp(14px, 1.6vw, 20px);
+  white-space: nowrap;
+  font-weight: 400;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.btn-solid:hover {
+  transform: scale(1.08);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+/* ================= DIVIDER ================= */
+.nav-divider {
+  height: 2px;
+  background: #000;
+  width: 100%;
+}
+
+/* ================= CONTENT AREA ================= */
+.content-area {
+  position: relative;
+  z-index: 1;
+  min-height: 120vh; /* Push banner well below viewport initially */
+  pointer-events: none;
+}
+
+/* ================= FOOTER (COUNTDOWN) ================= */
+.site-footer {
+  position: relative;
+  margin-top: 10vh; /* Small spacing from content above */
+  left: 0;
+  right: 0;
+  z-index: 20;
+  font-family: "Boldonese", sans-serif;
+}
+
+.footer-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Equal space for both sections */
+}
+
+.deadline-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Black header bar at top of each section - full width, no side padding */
+.deadline-header {
+  background: #000;
+  padding: 0;
+  display: flex;
+  align-items: stretch;
+  gap: 0;
+  width: 100%;
+}
+
+.orange-section {
+  background: #FF5F00;
+  padding: 0; /* Remove padding so header sits flush at top */
+}
+
+.orange-section .countdown-text {
+  padding: clamp(10px, 1.5vw, 16px) clamp(16px, 3vw, 32px);
+}
+
+.pink-section {
+  background: #E84EB5;
+  padding: 0; /* Remove padding so header sits flush at top */
+  justify-content: center;
+  align-items: flex-start;
+  border-left: 2px solid #000;
+}
+
+.pink-section .cost-text {
+  padding: clamp(10px, 1.5vw, 16px) clamp(16px, 3vw, 32px);
+}
+
+.deadline-label {
+  font-size: clamp(9px, 1vw, 12px);
+  color: #000; /* Black text */
+  background: #E84EB5; /* Pink/magenta background box */
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  padding: clamp(6px, 1vw, 10px) clamp(16px, 3vw, 32px);
+  display: flex;
+  align-items: center;
+}
+
+.time-limit-label {
+  font-size: clamp(9px, 1vw, 12px);
+  color: #FFF; /* White text */
+  background: #000; /* Black background */
+  letter-spacing: 0.02em;
+  font-weight: 700;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+  padding: clamp(6px, 1vw, 10px) clamp(16px, 3vw, 32px);
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.countdown-text {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(6px, 1vw, 12px);
+  color: #000;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.years, .days {
+  font-size: clamp(24px, 4vw, 56px);
+  font-weight: 900;
+}
+
+.years sub, .days sub {
+  font-size: clamp(9px, 1.2vw, 16px);
+  font-weight: 700;
+  vertical-align: baseline;
+  margin-left: clamp(1px, 0.2vw, 2px);
+}
+
+.time {
+  font-size: clamp(24px, 4vw, 56px);
+  font-weight: 900;
+}
+
+.cost-text {
+  font-size: clamp(32px, 5vw, 72px);
+  color: #000;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.trillion {
+  font-size: clamp(14px, 2.2vw, 28px);
+  font-weight: 700;
+  margin-left: clamp(4px, 0.6vw, 8px);
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 768px) {
+  .signup-bar {
+    padding: 8px 16px;
+    bottom: 0;
+  }
+  
+  .site-header {
+    top: 0;
+  }
+  
+  .nav-inner {
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 8px 16px;
+  }
+  
+  .logo {
+    order: 1;
+  }
+  
+  .nav-links {
+    order: 3;
+    width: 100%;
+    gap: 16px;
+  }
+  
+  .nav-actions {
+    order: 2;
+    margin-left: auto;
+  }
+  
+  .footer-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .pink-section {
+    border-left: none;
+    border-top: 2px solid #000;
+    min-width: auto;
+  }
+  
+  .content-area {
+    min-height: 30vh;
+  }
+  
+  .site-footer {
+    margin-top: 5vh;
+  }
+}
+
+.page2{
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 360px 1fr;
+  gap: 16px;
+  padding: 16px;
+  background: #07080b;
+  color: #eef0ff;
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+}
+
+.panel{
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.panel h1{ margin: 0 0 12px; font-size: 20px; }
+
+.controls{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.controls label{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size: 12px;
+  color: rgba(255,255,255,.8);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+
+.controls select{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.06);
+  color: #eef0ff;
+}
+
+.rangeRow{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.rangeRow input{ flex:1; }
+
+#btn{
+  border: 1px solid rgba(255,255,255,.14);
+  background: rgba(255,255,255,.08);
+  color: #eef0ff;
+  padding: 10px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.meta{
+  display:flex;
+  gap:12px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 12px;
+  color: rgba(255,255,255,.7);
+}
+
+.stage{
+  position: relative;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(0,0,0,.25);
+}
+
+#map{
+  width: 100%;
+  height: calc(100vh - 32px);
+}
+
+#sketch{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+@media (max-width: 900px){
+  .page2{ grid-template-columns: 1fr; }
+  #map{ height: 520px; }
+}
+
+.page2 { height: 100vh; }
+.stage { height: calc(100vh - 32px); }
+#map { height: 100% !important; width: 100%; }
+#sketch { height: 100% !important; width: 100%; }
+
+/* page2 overrides so Leaflet works */
+.page2-body{
+  min-height: 100vh;
+  overflow-y: auto;
+  background: #07080b;
+}
+
+/* make sure Leaflet container has real height */
+.page2 { height: 100vh; }
+.stage { height: calc(100vh - 32px); }
+#map { height: 100% !important; width: 100%; background: transparent; }
+#sketch { display:none; } /* not using p5 right now */
+
+/* remove Leaflet UI + tiles styling (we won't add a tile layer) */
+.leaflet-control-container { display: none; }

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bye2Boom – Live Heatmap</title>
+
+  <link rel="stylesheet" href="/src/style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+</head>
+
+<body>
+  <main class="page2">
+    <section class="panel">
+      <h1>Live Heatmap</h1>
+
+      <div class="controls">
+        <label>
+          Category
+          <select id="category">
+            <option value="angst">Angst</option>
+            <option value="kaeledyr">Kæledyr</option>
+            <option value="sundhed">Sundhed</option>
+            <option value="hoerelse">Hørelse</option>
+            <option value="affald">Affald</option>
+          </select>
+        </label>
+
+        <label>
+          Intensity
+          <div class="rangeRow">
+            <input id="intensity" type="range" min="1" max="5" value="3" />
+            <span id="iVal">3</span>
+          </div>
+        </label>
+
+        <button id="btn">Send</button>
+
+        <div class="meta">
+          <span id="count">Svar: 0</span>
+          <span id="gpsStatus">GPS: …</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="stage">
+      <div id="map"></div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module" src="/src/heatmap.js"></script>
+</body>
+</html>
